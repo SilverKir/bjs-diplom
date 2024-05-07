@@ -35,7 +35,7 @@ getCurrencyRate = () => {
 
 updateUserData = (data, message) => {
     if (data.success) {
-        updateData();
+        ProfileWidget.showProfile(data.data);
         moneyManager.setMessage(data.success, message);
     } else {
         moneyManager.setMessage(data.success, data.error);
