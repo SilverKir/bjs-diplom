@@ -7,9 +7,13 @@ const ratesBoard = new RatesBoard();
 const favoritesWidget = new FavoritesWidget();
 
 logoutButton.action = () => {
-    (confirm("Подтвердите выход из личного кабинета")) ?
-        ApiConnector.logout(unswer => { (unswer) ? location.reload() : "" }) :
-        ""
+    if (confirm("Подтвердите выход из личного кабинета")) {
+        ApiConnector.logout(response => {
+            if (response) {
+                location.reload()
+            }
+        })
+    }
 }
 
 updateData = () => {
@@ -29,9 +33,9 @@ getCurrencyRate = () => {
     })
 }
 
-updateUserData = (data, message, delay) => {
+updateUserData = (data, message) => {
     if (data.success) {
-        setTimeout(() => { updateData() }, delay);
+        updateData();
         moneyManager.setMessage(data.success, message);
     } else {
         moneyManager.setMessage(data.success, data.error);
@@ -39,20 +43,20 @@ updateUserData = (data, message, delay) => {
 }
 
 moneyManager.addMoneyCallback = data => {
-    ApiConnector.addMoney(data, callback => {
-        updateUserData(callback, "Пополнение счета на " + data.amount + " " + data.currency + " выполнено успешно", 7000)
+    ApiConnector.addMoney(data, response => {
+        updateUserData(response, "Пополнение счета на " + data.amount + " " + data.currency + " выполнено успешно")
     })
 }
 
 moneyManager.conversionMoneyCallback = data => {
-    ApiConnector.convertMoney(data, callback => {
-        updateUserData(callback, "Конвертация " + data.fromAmount + " " + data.fromCurrency + " в " + data.targetCurrency + " выполнена успешно", 7000)
+    ApiConnector.convertMoney(data, response => {
+        updateUserData(response, "Конвертация " + data.fromAmount + " " + data.fromCurrency + " в " + data.targetCurrency + " выполнена успешно")
     })
 }
 
 moneyManager.sendMoneyCallback = data => {
-    ApiConnector.transferMoney(data, callback => {
-        updateUserData(callback, "Перевод выполнен успешно", 7000)
+    ApiConnector.transferMoney(data, response => {
+        updateUserData(response, "Перевод выполнен успешно")
     })
 }
 
@@ -76,14 +80,14 @@ updateFavoritesData = (data, message) => {
 }
 
 favoritesWidget.addUserCallback = data => {
-    ApiConnector.addUserToFavorites(data, callback => {
-        updateFavoritesData(callback, data.name + " добавлен в избранное");
+    ApiConnector.addUserToFavorites(data, response => {
+        updateFavoritesData(response, data.name + " добавлен в избранное");
     })
 }
 
 favoritesWidget.removeUserCallback = data => {
-    ApiConnector.removeUserFromFavorites(data, callback => {
-        updateFavoritesData(callback, "Удаление успешно выполнено");
+    ApiConnector.removeUserFromFavorites(data, response => {
+        updateFavoritesData(response, "Удаление успешно выполнено");
     })
 }
 
