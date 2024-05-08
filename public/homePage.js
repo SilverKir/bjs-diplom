@@ -16,11 +16,18 @@ logoutButton.action = () => {
     }
 }
 
-updateData = () => {
+updateUserData = (data, message) => {
+    if (data.success) {
+        ProfileWidget.showProfile(data.data);
+        moneyManager.setMessage(data.success, message);
+    } else {
+        moneyManager.setMessage(data.success, data.error);
+    }
+}
+
+getCurrentUserData = () => {
     ApiConnector.current(userData => {
-        (userData.success) ?
-            ProfileWidget.showProfile(userData.data) :
-            moneyManager.setMessage(userData.success, userData.error)
+        updateUserData(userData, "Начальные данные загружены успешно")
     })
 }
 
@@ -31,15 +38,6 @@ getCurrencyRate = () => {
             ratesBoard.fillTable(currencyRate.data);
         }
     })
-}
-
-updateUserData = (data, message) => {
-    if (data.success) {
-        ProfileWidget.showProfile(data.data);
-        moneyManager.setMessage(data.success, message);
-    } else {
-        moneyManager.setMessage(data.success, data.error);
-    }
 }
 
 moneyManager.addMoneyCallback = data => {
@@ -60,23 +58,21 @@ moneyManager.sendMoneyCallback = data => {
     })
 }
 
-getFavoritesData = () => {
-    ApiConnector.getFavorites(favoritesData => {
-        if (favoritesData.success) {
-            favoritesWidget.clearTable();
-            favoritesWidget.fillTable(favoritesData.data);
-            moneyManager.updateUsersList(favoritesData.data);
-        }
-    })
-}
-
 updateFavoritesData = (data, message) => {
     if (data.success) {
+        favoritesWidget.clearTable();
+        favoritesWidget.fillTable(data.data);
+        moneyManager.updateUsersList(data.data);
         favoritesWidget.setMessage(data.success, message);
-        getFavoritesData();
     } else {
         favoritesWidget.setMessage(data.success, data.error);
     }
+}
+
+getFavoritesData = () => {
+    ApiConnector.getFavorites(favoritesData => {
+        updateFavoritesData(favoritesData, "Данные загружены успешно");
+    })
 }
 
 favoritesWidget.addUserCallback = data => {
@@ -91,7 +87,7 @@ favoritesWidget.removeUserCallback = data => {
     })
 }
 
-updateData();
+getCurrentUserData();
 
 getCurrencyRate();
 
